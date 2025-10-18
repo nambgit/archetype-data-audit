@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Audit Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .status-active { color: #198754; font-weight: 600; }
+        .status-archived { color: #dc3545; font-weight: 600; }
+        .status-deleted { color: #6c757d; font-weight: 600; }
+        .file-path {
+            font-family: monospace;
+            font-size: 0.9em;
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .card-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h2 class="mb-0">
+                    <i class="fas fa-database me-2"></i>Data Audit & Archive Dashboard
+                </h2>
+                <p class="mb-0 opacity-75">Manage and restore archived files</p>
+            </div>
+            <div class="card-body">
+                {% if files %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Source</th>
+                                <th>File Path</th>
+                                <th>Last Accessed</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in files %}
+                            <tr>
+                                <td><code>{{ file.id }}</code></td>
+                                <td>
+                                    {% if file.source == 'fileserver' %}
+                                        <span class="badge bg-primary">File Server</span>
+                                    {% elif file.source == 'sharepoint' %}
+                                        <span class="badge bg-success">SharePoint</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ file.source }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="file-path" title="{{ file.file_path }}">
+                                    {{ file.file_path }}
+                                </td>
+                                <td>
+                                    {% if file.last_accessed %}
+                                        {{ file.last_accessed.strftime('%Y-%m-%d %H:%M') if file.last_accessed else '—' }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if file.status == 'Active' %}
+                                        <span class="status-active">Active</span>
+                                    {% elif file.status == 'Archived' %}
+                                        <span class="status-archived">Archived</span>
+                                    {% elif file.status == 'Deleted' %}
+                                        <span class="status-deleted">Deleted</span>
+                                    {% else %}
+                                        {{ file.status }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <!-- Download -->
+                                    <a href="/download/{{ file.id }}" 
+                                       class="btn btn-sm btn-outline-primary me-1"
+                                       title="Download file">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+
+                                    <!-- Restore show when file is Archived -->
+                                    {% if file.status == 'Archived' %}
+                                    <a href="/restore/{{ file.id }}" 
+                                       class="btn btn-sm btn-outline-warning"
+                                       onclick="return confirm('Restore this file to its original location?')"
+                                       title="Restore from archive">
+                                        <i class="fas fa-undo"></i>
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5>No audit records found.</h5>
+                    <p class="text-muted">Run <code>scanner</code> to populate data.</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer text-muted small">
+                <i class="fas fa-info-circle me-1"></i>
+                Only the 10 most recent records are displayed.
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

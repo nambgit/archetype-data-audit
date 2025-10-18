@@ -1,0 +1,92 @@
+# Configuration Settings Document
+# File: config/network_config.yml
+network_configuration:
+  
+  on_premise:
+    file_server:
+      hostname: fileserver.archetype.local
+      ip_address: 192.168.1.7
+      shared_paths:
+        - \\fileserver\Shared
+      protocol: SMB
+      port: 445
+      
+    active_directory:
+      domain: archetype.local
+      base_dn: DC=archetype,DC=local
+      admin_group: CN=IT Admins,OU=Groups,DC=archetype,DC=local
+  
+#  microsoft_365:
+#    sharepoint:
+#      tenant: yourcompany.sharepoint.com
+#      site_url: https://yourcompany.sharepoint.com/sites/DataArchive
+#      api_endpoint: https://yourcompany.sharepoint.com/_api
+#      authentication: OAuth2
+      
+#    exchange:
+#      smtp_server: smtp.office365.com
+#      smtp_port: 587
+#      notification_email: noreply@company.com
+  
+  aws_infrastructure:
+    region: ap-southeast-1
+    availability_zones:
+      - ap-southeast-1a
+    
+    s3_storage:
+      bucket_name: data-audit-archive-2025
+      glacier_tier: GLACIER_IR
+      encryption: AES256
+      versioning: enabled
+      lifecycle_rules:
+        - transition_days: 180
+          storage_class: GLACIER
+    
+#    rds_database:
+#      engine: postgresql
+#      version: 16
+#      instance_class: db.t3.micro
+#      allocated_storage: 100
+#      multi_az: true
+#      backup_retention: 7
+#      encryption: true
+#      endpoint: file-archive-db.ap-southeast-1a.rds.amazonaws.com
+#      port: 5432
+    
+    lambda_functions:
+      runtime: python3.11
+      memory: 512
+      timeout: 300
+
+  firewall_rules:
+    inbound:
+      - source: 192.168.1.0/24
+        destination: 10.0.1.50
+        port: 443
+        protocol: TCP
+        description: "Admin access to Web API"
+      
+      - source: 10.0.1.0/24
+        destination: RDS_Endpoint
+        port: 5432
+        protocol: TCP
+        description: "Application to Database"
+    
+    outbound:
+      - source: 10.0.1.50
+        destination: 0.0.0.0/0
+        port: 443
+        protocol: TCP
+        description: "AWS API calls"
+
+  monitoring:
+    cloudwatch:
+      log_groups:
+        - /aws/lambda/file-archiver
+        - /application/scanner
+        - /application/api
+      metrics:
+        - CPU_Utilization
+        - Memory_Usage
+        - Disk_Usage
+        - API_Request_Count
