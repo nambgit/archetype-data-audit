@@ -102,7 +102,7 @@ def scan_file_server():
                     try:
                         # Attempt to archive to S3
                         from archive.s3_archiver import archive_file_to_s3
-                        s3_url = archive_file_to_s3(filepath, checksum)
+                        s3_url = archive_file_to_s3(filepath)
 
                         # Remove original file after successful upload
                         os.remove(filepath)
