@@ -19,7 +19,16 @@ class PostgresSettings:
     GRAPH_TENANT_ID = os.getenv("GRAPH_TENANT_ID", "")
     GRAPH_CLIENT_SECRET = os.getenv("GRAPH_CLIENT_SECRET", "")
     
-    # S3 Storage
+    # --- Active Directory / LDAP ---
+    AD_SERVER: str = os.getenv("AD_SERVER", "")
+    AD_PORT: int = int(os.getenv("AD_PORT", ""))                 # 636 = LDAPS
+    AD_USE_SSL: bool = os.getenv("AD_USE_SSL", "true").lower() == "true"
+    AD_BASE_DN: str = os.getenv("AD_BASE_DN", "dc=archetype,dc=local")
+    LDAP_SKIP_CERT_VERIFY: bool = os.getenv("LDAP_SKIP_CERT_VERIFY", "false").lower() == "true"
+    #AD_BIND_USER: str = os.getenv("AD_BIND_USER", "") 
+    #AD_BIND_PASSWORD: str = os.getenv("AD_BIND_PASSWORD", "")
+
+    # AWS
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
     ARCHIVE_BUCKET = os.getenv("ARCHIVE_BUCKET", "")
