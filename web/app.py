@@ -6,6 +6,7 @@ Includes basic authentication and file restore/download actions.
 from flask import Flask, render_template, request, Response, send_file
 from db.connection import get_db_connection
 from config.settings import settings
+from archive.s3_archiver import download_restored_file, restore_file_from_s3
 import os
 # Initialize Flask app
 app = Flask(__name__)
@@ -93,7 +94,7 @@ def restore_file(file_id):
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             # Get archive URL
-            cur.execute("SELECT archive_url FROM file_audit WHERE id = %s", (file_id,))
+            cur.execute("SELECT archive_url, file_path FROM file_audit WHERE id = %s", (file_id,))
             row = cur.fetchone()
             
             if not row or not row['archive_url']:
