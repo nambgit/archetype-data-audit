@@ -6,24 +6,24 @@ load_dotenv()
 
 class PostgresSettings:
     # PostgreSQL Database
-    DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_PORT = int(os.getenv("DB_PORT", "5432"))
-    DB_NAME = os.getenv("DB_NAME", "audit_db")
+    DB_HOST = os.getenv("DB_HOST", "")
+    DB_PORT = int(os.getenv("DB_PORT", ""))
+    DB_NAME = os.getenv("DB_NAME", "")
     DB_USER = os.getenv("DB_USER", "")
     DB_PASSWORD = os.getenv("DB_PASSWORD", "")
     
     # File Server Root Path
-    FILE_SERVER_ROOT = os.getenv("FILE_SERVER_ROOT", "F:\\DataAudit")
-    SHAREPOINT_SITE_ID = os.getenv("SHAREPOINT_SITE_ID")
-    GRAPH_CLIENT_ID = os.getenv("GRAPH_CLIENT_ID")
-    GRAPH_TENANT_ID = os.getenv("GRAPH_TENANT_ID")
-    GRAPH_CLIENT_SECRET = os.getenv("GRAPH_CLIENT_SECRET")
+    FILE_SERVER_ROOT = os.getenv("FILE_SERVER_ROOT", "")
+    SHAREPOINT_SITE_ID = os.getenv("SHAREPOINT_SITE_ID", "")
+    GRAPH_CLIENT_ID = os.getenv("GRAPH_CLIENT_ID", "")
+    GRAPH_TENANT_ID = os.getenv("GRAPH_TENANT_ID", "")
+    GRAPH_CLIENT_SECRET = os.getenv("GRAPH_CLIENT_SECRET", "")
     
     # S3 Storage
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
     ARCHIVE_BUCKET = os.getenv("ARCHIVE_BUCKET", "")
-    AWS_REGION = os.getenv("AWS_REGION", "ap-southeast-1")
+    AWS_REGION = os.getenv("AWS_REGION", "")
     S3_STORAGE_CLASS = "DEEP_ARCHIVE"  # or "GLACIER"
 
     # Web UI Configuration
