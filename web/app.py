@@ -3,10 +3,10 @@ Flask web interface for IT Admins to view and manage archived files.
 Includes basic authentication and file restore/download actions.
 """
 
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, send_file
 from db.connection import get_db_connection
 from config.settings import settings
-
+import os
 # Initialize Flask app
 app = Flask(__name__)
 
