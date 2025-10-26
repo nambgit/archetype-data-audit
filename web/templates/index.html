@@ -24,6 +24,23 @@
         .card-header {
             background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
             color: white;
+            position: relative;
+        }
+        .logout-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: white;
         }
     </style>
 </head>
@@ -35,6 +52,10 @@
                     <i class="fas fa-database me-2"></i>Data Audit & Archive Dashboard
                 </h2>
                 <p class="mb-0 opacity-75">Manage and restore archived files</p>
+                <!-- Nút Logout -->
+                <a href="{{ url_for('logout') }}" class="logout-btn" title="Sign out">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
             </div>
             <div class="card-body">
                 {% if files %}
