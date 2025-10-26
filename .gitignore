@@ -1,7 +1,5 @@
 .gitignore
 .env
-__pycache__/
-**/__pycache__/
 
 # Logs
 *.log
@@ -16,5 +14,4 @@ tmp/
 temp/
 *.tmp
 
-db_postgresql_test/
 documents
