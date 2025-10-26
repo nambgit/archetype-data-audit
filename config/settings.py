@@ -21,7 +21,7 @@ class PostgresSettings:
     
     # --- Active Directory / LDAP ---
     AD_SERVER: str = os.getenv("AD_SERVER", "")
-    AD_PORT: int = int(os.getenv("AD_PORT", ""))                 # 636 = LDAPS
+    AD_PORT: int = int(os.getenv("AD_PORT", ""))    
     AD_USE_SSL: bool = os.getenv("AD_USE_SSL", "true").lower() == "true"
     AD_BASE_DN: str = os.getenv("AD_BASE_DN", "dc=archetype,dc=local")
     LDAP_SKIP_CERT_VERIFY: bool = os.getenv("LDAP_SKIP_CERT_VERIFY", "false").lower() == "true"
