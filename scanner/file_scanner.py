@@ -5,10 +5,32 @@ Automatically archive files not accessed in >180 days.
 
 import os
 import hashlib
+import win32file
+import win32security
 from datetime import datetime, timezone, timedelta
 from db.connection import get_db_connection
 from config.settings import settings
 
+def get_file_owner(filepath: str) -> str:
+    """
+    Get the owner of a file on Windows (NTFS).
+    
+    Args:
+        filepath (str): Full path to the file (local or UNC)
+        
+    Returns:
+        str: Owner in format 'DOMAIN\\Username' or 'UNKNOWN' if failed
+    """
+    try:
+        # Get security descriptor with owner info
+        sd = win32security.GetFileSecurity(filepath, win32security.OWNER_SECURITY_INFORMATION)
+        owner_sid = sd.GetSecurityDescriptorOwner()
+        name, domain, _ = win32security.LookupAccountSid(None, owner_sid)
+        return f"{domain}\\{name}"
+    except Exception as e:
+        # Log error if needed, but don't crash the scan
+        return "UNKNOWN"
+    
 def _compute_file_checksum(file_path, chunk_size=8192):
     """
     Compute MD5 checksum of a file in chunks to handle large files efficiently.
@@ -73,6 +95,7 @@ def scan_file_server():
 
                 # Compute MD5 checksum
                 checksum = _compute_file_checksum(filepath)
+                owner = get_file_owner(filepath)
 
                 # Save metadata to database
                 with get_db_connection() as conn:
@@ -84,10 +107,11 @@ def scan_file_server():
                             ON CONFLICT (file_path) DO UPDATE SET
                                 last_modified = EXCLUDED.last_modified,
                                 last_accessed = EXCLUDED.last_accessed,
+                                owner = EXCLUDED.owner,
                                 checksum = EXCLUDED.checksum,
                                 status = 'Active',
                                 updated_at = CURRENT_TIMESTAMP
-                        """, ("fileserver", filepath, last_modified, last_accessed, "system", checksum))
+                        """, ("fileserver", filepath, last_modified, last_accessed, owner, checksum))
                     conn.commit()
                 
                 processed_count += 1

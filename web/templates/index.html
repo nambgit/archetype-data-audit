@@ -3,146 +3,697 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Audit Dashboard</title>
+    <title>File Audit Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body {
-            background-color: #f8f9fa;
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+            --gray-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
-        .status-active { color: #198754; font-weight: 600; }
-        .status-archived { color: #dc3545; font-weight: 600; }
-        .status-deleted { color: #6c757d; font-weight: 600; }
-        .file-path {
-            font-family: monospace;
-            font-size: 0.9em;
-            max-width: 300px;
+
+        body {
+            background: var(--gray-bg);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .header-wrapper {
+            background: var(--primary-gradient);
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            padding: 1.5rem 0;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-title h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            margin: 0;
+            padding-left: 64px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .btn-header {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.5rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-header:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-container {
+            padding: 2rem 0;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-lg);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon.primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .stat-icon.success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .stat-icon.warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
+        .stat-icon.danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            background: linear-gradient(to right, #f8fafc, #f1f5f9);
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        /* Custom Table */
+        .custom-table {
+            width: 100%;
+            margin: 0;
+        }
+
+        .custom-table thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1rem 1.25rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .custom-table tbody td {
+            padding: 1.25rem 1.25rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
+        .custom-table tbody tr {
+            transition: all 0.2s;
+        }
+
+        .custom-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .source-badge {
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .badge-fileserver {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .badge-sharepoint {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-archived {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-restoring {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .status-deleted {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        /* File Path */
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 400px;
+        }
+
+        .file-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            flex-shrink: 0;
+        }
+
+        .file-details {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #1e293b;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            display: block;
+            font-size: 0.9375rem;
         }
-        .card-header {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            position: relative;
+
+        .file-path-text {
+            font-size: 0.8125rem;
+            color: #94a3b8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+            font-family: monospace;
         }
-        .logout-btn {
-            position: absolute;
-            top: 12px;
-            right: 16px;
+
+        /* Action Buttons */
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .action-btn.download {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
+        }
+
+        .action-btn.download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .action-btn.restore {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .action-btn.restore:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #94a3b8;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        .table-footer {
+            padding: 1.25rem 1.5rem;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-text {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .footer-links a {
+            color: #667eea;
             text-decoration: none;
             font-weight: 500;
-            padding: 4px 10px;
-            border-radius: 4px;
-            transition: background 0.2s;
+            margin-left: 1.5rem;
+            transition: color 0.2s;
         }
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            text-decoration: none;
+
+        .footer-links a:hover {
+            color: #764ba2;
+        }
+
+        /* Owner Cell */
+        .owner-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .owner-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-header {
+                width: 100%;
+            }
+
+            .stat-card {
+                margin-bottom: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container py-4">
-        <div class="card shadow-sm">
-            <div class="card-header">
-                <h2 class="mb-0">
-                    <i class="fas fa-database me-2"></i>Data Audit & Archive Dashboard
-                </h2>
-                <p class="mb-0 opacity-75">Manage and restore archived files</p>
-                <!-- Nút Logout -->
-                <a href="{{ url_for('logout') }}" class="logout-btn" title="Sign out">
-                    <i class="fas fa-sign-out-alt me-1"></i>Logout
-                </a>
+    <!-- Header -->
+    <div class="header-wrapper">
+        <div class="container-fluid">
+            <div class="header-content">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <div class="header-title">
+                            <div class="header-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h1>File Audit Dashboard</h1>
+                            </div>
+                        </div>
+                        <p class="header-subtitle">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Centralized file management for SharePoint and File Server
+                        </p>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="header-actions">
+                            <a href="{{ url_for('logout') }}" class="btn-header">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                {% if files %}
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>ID</th>
-                                <th>Source</th>
-                                <th>File Path</th>
-                                <th>Last Accessed</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for file in files %}
-                            <tr>
-                                <td><code>{{ file.id }}</code></td>
-                                <td>
-                                    {% if file.source == 'fileserver' %}
-                                        <span class="badge bg-primary">File Server</span>
-                                    {% elif file.source == 'sharepoint' %}
-                                        <span class="badge bg-success">SharePoint</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid main-container">
+        <!-- Stats Row -->
+        <div class="row stats-row">
+            <!--<div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-value">{{ files|length }}</div>
+                    <div class="stat-label">Total Files Shown</div>
+                </div>
+            </div> -->
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon danger">
+                        <i class="fab fa-microsoft"></i>
+                    </div>
+                    <div class="stat-value">{{ files|selectattr('source', 'equalto', 'sharepoint')|list|length }}</div>
+                    <div class="stat-label">SharePoint</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stat-value">{{ files|selectattr('source', 'equalto', 'fileserver')|list|length }}</div>
+                    <div class="stat-label">File Server</div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 mb-2">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ files|selectattr('status', 'equalto', 'Active')|list|length }}</div>
+                    <div class="stat-label">Active Files</div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 mb-2">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ total_archived }}</div>
+                    <div class="stat-label">Archived Files</div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 mb-2">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ total_restoring }}</div>
+                    <div class="stat-label">Restoring Files</div>
+                </div>
+            </div>  
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3><i class="fas fa-folder-open me-2"></i>File Records</h3>
+            </div>
+
+            {% if files %}
+            <div class="table-responsive">
+                <table class="custom-table" id="filesTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">ID</th>
+                            <th style="width: 130px;">Source</th>
+                            <th style="width: 320px;">File</th>
+                            <th style="width: 150px;">Owner</th>
+                            <th style="width: 140px;">Modified</th>
+                            <th style="width: 120px;">Status</th>
+                            <th style="width: 100px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for file in files %}
+                        <tr>
+                            <td><code class="text-muted">#{{ file.id }}</code></td>
+                            
+                            <!-- Source -->
+                            <td>
+                                {% if file.source == 'fileserver' %}
+                                    <span class="source-badge badge-fileserver">
+                                        <i class="fas fa-server"></i>
+                                        File Server
+                                    </span>
+                                {% elif file.source == 'sharepoint' %}
+                                    <span class="source-badge badge-sharepoint">
+                                        <i class="fab fa-microsoft"></i>
+                                        SharePoint
+                                    </span>
+                                {% else %}
+                                    <span class="source-badge" style="background: #e5e7eb; color: #374151;">
+                                        {{ file.source }}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- File Info -->
+                            <td>
+                                <div class="file-info" title="{{ file.file_path }}">
+                                    <div class="file-icon">
+                                        <i class="fas fa-file-alt"></i>
+                                    </div>
+                                    <div class="file-details">
+                                        <span class="file-name">{{ file.file_path.split('/')[-1] }}</span>
+                                        <span class="file-path-text">{{ file.file_path }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <!-- Owner -->
+                            <td>
+                                <div class="owner-info" title="{{ file.owner if file.owner else 'Unknown' }}">
+                                    {% if file.owner %}
+                                        <div class="owner-avatar">
+                                            {{ file.owner[0]|upper }}
+                                        </div>
+                                        <span>{{ file.owner }}</span>
                                     {% else %}
-                                        <span class="badge bg-secondary">{{ file.source }}</span>
+                                        <span class="text-muted">—</span>
                                     {% endif %}
-                                </td>
-                                <td class="file-path" title="{{ file.file_path }}">
-                                    {{ file.file_path }}
-                                </td>
-                                <td>
-                                    {% if file.last_accessed %}
-                                        {{ file.last_accessed.strftime('%Y-%m-%d %H:%M') if file.last_accessed else '—' }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if file.status == 'Active' %}
-                                        <span class="status-active">Active</span>
-                                    {% elif file.status == 'Archived' %}
-                                        <span class="status-archived">Archived</span>
-                                    {% elif file.status == 'Deleted' %}
-                                        <span class="status-deleted">Deleted</span>
-                                    {% else %}
-                                        {{ file.status }}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <!-- Download -->
+                                </div>
+                            </td>
+                            
+                            <!-- Last Modified -->
+                            <td class="text-muted" style="font-size: 0.875rem;">
+                                {% if file.last_modified %}
+                                    <i class="far fa-clock me-1"></i>
+                                    {{ file.last_modified.strftime('%Y-%m-%d') }}<br>
+                                    <small style="color: #94a3b8;">{{ file.last_modified.strftime('%H:%M') }}</small>
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Status -->
+                            <td>
+                                {% if file.status == 'Active' %}
+                                    <span class="status-badge status-active">
+                                        <i class="fas fa-check-circle"></i>
+                                        Active
+                                    </span>
+                                {% elif file.status == 'Archived' %}
+                                    <span class="status-badge status-archived">
+                                        <i class="fas fa-archive"></i>
+                                        Archived
+                                    </span>
+                                {% elif file.status == 'Restoring' %}
+                                    <span class="status-badge status-restoring">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        Restoring
+                                    </span>
+                                {% elif file.status == 'Deleted' %}
+                                    <span class="status-badge status-deleted">
+                                        <i class="fas fa-trash"></i>
+                                        Deleted
+                                    </span>
+                                {% else %}
+                                    {{ file.status }}
+                                {% endif %}
+                            </td>
+                            
+                            <!-- Actions -->
+                            <td>
+                                <div style="display: flex; gap: 0.5rem;">
                                     <a href="/download/{{ file.id }}" 
-                                       class="btn btn-sm btn-outline-primary me-1"
-                                       title="Download file">
+                                       class="action-btn download"
+                                       title="Download file"
+                                       {% if file.status == 'Archived' %}onclick="return false;" style="opacity: 0.5; cursor: not-allowed;"{% endif %}>
                                         <i class="fas fa-download"></i>
                                     </a>
 
-                                    <!-- Restore show when file is Archived -->
-                                    {% if file.status == 'Archived' %}
+                                    {% if file.status == 'Archived' and file.source == 'fileserver' %}
                                     <a href="/restore/{{ file.id }}" 
-                                       class="btn btn-sm btn-outline-warning"
-                                       onclick="return confirm('Restore this file to its original location?')"
-                                       title="Restore from archive">
+                                       class="action-btn restore"
+                                       onclick="return confirm('Restore this file? It will be available in 12-48 hours.')"
+                                       title="Restore from Glacier">
                                         <i class="fas fa-undo"></i>
                                     </a>
                                     {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                    <h5>No audit records found.</h5>
-                    <p class="text-muted">Run <code>scanner</code> to populate data.</p>
-                </div>
-                {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <div class="card-footer text-muted small">
-                <i class="fas fa-info-circle me-1"></i>
-                Only the 10 most recent records are displayed.
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-folder-open"></i>
+                </div>
+                <h3>No Files Found</h3>
+                <p>Run the scanner to populate data from SharePoint or File Server</p>
+            </div>
+            {% endif %}
+
+            <div class="table-footer">
+                <div class="footer-text">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Showing latest 10 records
+                </div>
+                <div class="footer-links">
+                    <a href="/"><i class="fas fa-sync-alt me-1"></i>Refresh</a>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Prevent download on archived files
+        document.querySelectorAll('.action-btn.download').forEach(btn => {
+            if (btn.style.opacity === '0.5') {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('This file is archived. Please restore it first before downloading.');
+                });
+            }
+        });
+    </script>
 </body>
 </html>

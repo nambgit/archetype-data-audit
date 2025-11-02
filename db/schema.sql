@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS file_audit (
     checksum TEXT NOT NULL,
     archive_url TEXT,
     status TEXT NOT NULL DEFAULT 'Active' 
-        CHECK (status IN ('Active', 'Archived', 'Deleted')),
+        CHECK (status IN ('Active', 'Archived', 'Deleted', 'Restoring')),
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
