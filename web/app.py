@@ -84,24 +84,33 @@ def dashboard():
     # Fetch latest 10 records from database """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT * FROM file_audit ORDER BY created_at DESC LIMIT 20")
+            cur.execute("SELECT * FROM file_audit ORDER BY created_at DESC LIMIT 15")
             files = cur.fetchall()
 
             # Fetch total counts by status (for stats cards)
             cur.execute("""
                 SELECT 
                     COUNT(*) FILTER (WHERE status = 'Archived') AS archived_count,
-                    COUNT(*) FILTER (WHERE status = 'Restoring') AS restoring_count
+                    COUNT(*) FILTER (WHERE status = 'Active') AS active_count,
+                    COUNT(*) FILTER (WHERE status = 'Restoring') AS restoring_count,
+                    COUNT(*) FILTER (WHERE source = 'fileserver') AS fileserver_count,
+                    COUNT(*) FILTER (WHERE source = 'sharepoint') AS sharepoint_count
                 FROM file_audit
             """)
             counts = cur.fetchone()
             total_archived = counts['archived_count'] or 0
+            total_active = counts['active_count'] or 0
             total_restoring = counts['restoring_count'] or 0
+            total_fileserver = counts['fileserver_count'] or 0
+            total_sharepoint = counts['sharepoint_count'] or 0
     return render_template(
         'index.html',
         files=files,
         total_archived=total_archived,
-        total_restoring=total_restoring
+        total_active=total_active,
+        total_restoring=total_restoring,
+        total_fileserver=total_fileserver,
+        total_sharepoint=total_sharepoint
     )
 
 def download_from_sharepoint(file_url, filename):

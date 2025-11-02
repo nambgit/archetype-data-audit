@@ -485,7 +485,7 @@
                     <div class="stat-icon danger">
                         <i class="fab fa-microsoft"></i>
                     </div>
-                    <div class="stat-value">{{ files|selectattr('source', 'equalto', 'sharepoint')|list|length }}</div>
+                    <div class="stat-value">{{ total_sharepoint }}</div>
                     <div class="stat-label">SharePoint</div>
                 </div>
             </div>
@@ -494,7 +494,7 @@
                     <div class="stat-icon warning">
                         <i class="fas fa-server"></i>
                     </div>
-                    <div class="stat-value">{{ files|selectattr('source', 'equalto', 'fileserver')|list|length }}</div>
+                    <div class="stat-value">{{ total_fileserver }}</div>
                     <div class="stat-label">File Server</div>
                 </div>
             </div>
@@ -503,7 +503,7 @@
                     <div class="stat-icon success">
                         <i class="fas fa-check-circle"></i>
                     </div>
-                    <div class="stat-value">{{ files|selectattr('status', 'equalto', 'Active')|list|length }}</div>
+                    <div class="stat-value">{{ total_active }}</div>
                     <div class="stat-label">Active Files</div>
                 </div>
             </div>
@@ -597,7 +597,7 @@
                                     {% endif %}
                                 </div>
                             </td>
-                            
+
                             <!-- Last Modified -->
                             <td class="text-muted" style="font-size: 0.875rem;">
                                 {% if file.last_modified %}
