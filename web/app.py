@@ -29,18 +29,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-#def check_auth(username, password):
-#    """Validate admin credentials."""
-#    return username == settings.ADMIN_USERNAME and password == settings.ADMIN_PASSWORD
-
-#def authenticate():
-#    """Send 401 response for unauthorized access."""
-#    return Response(
-#        'IT Admin Login Required', 401,
-#        {'WWW-Authenticate': 'Basic realm="Audit System"'}
-#    )
-
-
 # === Authentication Decorator ===
 def login_required(f):
     @wraps(f)
@@ -54,10 +42,30 @@ def login_required(f):
 # === Routes Login ===
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
+    # Using login via Domain controller
+    """if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         if authenticate_user(username, password):
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password', 'error')
+    return render_template('login.html')"""
+
+    # Login via ENV
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        # Lấy thông tin từ .env
+        expected_username = os.getenv("ADMIN_USERNAME")
+        expected_password = os.getenv("ADMIN_PASSWORD")
+
+        # Kiểm tra username và password
+        if expected_username and expected_password and \
+           username == expected_username and password == expected_password:
             session['logged_in'] = True
             session['username'] = username
             return redirect(url_for('dashboard'))
