@@ -13,5 +13,6 @@ Thumbs.db
 tmp/
 temp/
 *.tmp
-
+__pycache__
 documents
+
